@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>BlazorDemo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>BlazorWasmDemo</title>
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-    <link href="css/site.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -19,6 +19,30 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        window.getUSBDevices = async(none) =>
+        {          
+            try
+            {
+                var device = await navigator.usb.requestDevice({filters: []});
+                if (device !== undefined)
+                    return device.productName + "," + device.serialNumber;
+            }
+            catch (err)
+            {
+                console.log(err);
+                return "err";
+            }
+            
+        };
+
+        window.showDevice = (product, serial) =>
+        {
+            var item = document.getElementById("device-list");
+            item.innerHTML = "<div><p>Product Name: <strong>" + product + "</strong></p>" + 
+                            "<p>Serial Number: <strong>" + serial + "</strong></p></div>";
+        };
+    </script>
 </body>
 
 </html>

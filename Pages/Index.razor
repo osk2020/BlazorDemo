@@ -1,7 +1,50 @@
 ﻿@page "/"
+@inject IJSRuntime JS;
+
+@using Microsoft.Extensions.Logging;
+@inject ILogger<Index> Logger;
+
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+<br/><br/>
+<button class='btn btn-primary' @onclick='OnCreateLogs'>Create Logs!</button>
+<br/><br/>
+<button class='btn btn-primary' @onclick='OnListDevices'>List Devices!</button>
+<br/><br/>
+<p id='device-list'></p>
+
+@functions {
+    protected void OnCreateLogs()
+    {
+        var logLevels = Enum.GetValues(typeof(LogLevel)).Cast<LogLevel>();
+        foreach (var logLevel in logLevels.Where(l => l != LogLevel.None))
+        {
+            Logger.Log(logLevel, logLevel.ToString());
+        }    
+    }
+    protected async Task OnListDevices()
+    {
+        try
+        {
+            var device = await this.JS.InvokeAsync<string>("getUSBDevices", new object[] { "ok" });
+            //var device = "21234,234234";
+            Console.WriteLine(device);
+            var tokens = device.Split(",", StringSplitOptions.RemoveEmptyEntries);
+            Console.WriteLine(tokens.Length);
+            if (tokens.Length > 0)
+            {
+                string p_name = tokens[0];
+                string s_num = tokens.Length > 1 ? tokens[1] : "";
+                await this.JS.InvokeAsync<bool>("showDevice", new object[] { p_name, s_num });
+            }
+        }
+        catch
+        {}
+
+    }
+}
